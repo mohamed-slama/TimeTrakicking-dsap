@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Menu, Bell, Search } from "lucide-react";
+import { Menu, Bell, Search, LogOut, User } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
 interface TopBarProps {
@@ -11,6 +20,11 @@ interface TopBarProps {
 
 const TopBar = ({ onMenuClick, className }: TopBarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { user, logoutMutation } = useAuth();
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   return (
     <div className={cn("relative z-10 flex-shrink-0 flex h-16 bg-white shadow", className)}>
@@ -48,16 +62,42 @@ const TopBar = ({ onMenuClick, className }: TopBarProps) => {
           >
             <Bell className="h-5 w-5" />
           </Button>
-          <Button
-            variant="ghost"
-            className="md:hidden p-2 ml-3 text-gray-400 rounded-full hover:text-gray-500"
-          >
-            <img
-              className="h-8 w-8 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt="User profile picture"
-            />
-          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="p-2 ml-3 text-gray-400 rounded-full hover:text-gray-500 flex items-center"
+              >
+                <img
+                  className="h-8 w-8 rounded-full"
+                  src={user?.avatarUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.fullName || "User")}
+                  alt={user?.fullName || "User profile"}
+                />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span>{user?.fullName}</span>
+                  <span className="text-xs text-muted-foreground truncate max-w-[200px]">{user?.email}</span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer text-red-500" 
+                onClick={handleLogout}
+                disabled={logoutMutation.isPending}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
