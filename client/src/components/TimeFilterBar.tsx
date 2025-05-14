@@ -22,7 +22,7 @@ const TimeFilterBar = ({ onFilterChange }: TimeFilterBarProps) => {
   const [selectedUserId, setSelectedUserId] = useState<number | undefined>(undefined);
 
   // Fetch team members for dropdown
-  const { data: users } = useQuery({
+  const { data: users } = useQuery<User[]>({
     queryKey: ['/api/users'],
   });
 
@@ -124,7 +124,7 @@ const TimeFilterBar = ({ onFilterChange }: TimeFilterBarProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Team Members</SelectItem>
-              {users?.map(user => (
+              {users?.map((user: User) => (
                 <SelectItem key={user.id} value={user.id.toString()}>
                   {user.fullName}
                 </SelectItem>
