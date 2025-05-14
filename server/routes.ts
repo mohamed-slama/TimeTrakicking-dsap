@@ -224,7 +224,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/time-entries", async (req: Request, res: Response) => {
     try {
-      const timeEntryData = timeEntryFormSchema.parse(req.body);
+      const formData = timeEntryFormSchema.parse(req.body);
+      // Convert hours to string to match the schema
+      const timeEntryData = {
+        ...formData,
+        hours: formData.hours.toString()
+      };
       const newTimeEntry = await storage.createTimeEntry(timeEntryData);
       res.status(201).json(newTimeEntry);
     } catch (error) {
@@ -239,7 +244,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/time-entries/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const timeEntryData = timeEntryFormSchema.partial().parse(req.body);
+      const formData = timeEntryFormSchema.partial().parse(req.body);
+      
+      // Convert hours to string if present
+      const timeEntryData = formData.hours !== undefined
+        ? { ...formData, hours: formData.hours.toString() }
+        : formData;
+        
       const updatedTimeEntry = await storage.updateTimeEntry(id, timeEntryData);
       if (!updatedTimeEntry) {
         return res.status(404).json({ message: "Time entry not found" });
