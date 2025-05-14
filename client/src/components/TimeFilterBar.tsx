@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { User } from "@shared/schema";
 
 interface TimeFilterBarProps {
   onFilterChange: (filters: {
