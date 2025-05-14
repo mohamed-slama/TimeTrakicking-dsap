@@ -1,15 +1,27 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertTimeEntrySchema, insertClientSchema, insertProjectSchema, timeEntryFormSchema } from "@shared/schema";
+import { insertTimeEntrySchema, insertClientSchema, insertProjectSchema, timeEntryFormSchema, insertUserSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { setupAuth } from "./auth";
+
+// Middleware to ensure user is authenticated
+function isAuthenticated(req: Request, res: Response, next: NextFunction) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: "Unauthorized" });
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  setupAuth(app);
+  
   // API routes - all prefixed with /api
   
   // Users endpoints
-  app.get("/api/users", async (_req: Request, res: Response) => {
+  app.get("/api/users", isAuthenticated, async (_req: Request, res: Response) => {
     try {
       const users = await storage.getAllUsers();
       res.json(users);
