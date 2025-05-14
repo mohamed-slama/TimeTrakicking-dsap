@@ -18,37 +18,51 @@ import AppLayout from "@/layout/AppLayout";
 function Router() {
   return (
     <Switch>
-      <ProtectedRoute path="/" component={Dashboard} />
-      <ProtectedRoute path="/time-entries" component={TimeEntries} />
-      <ProtectedRoute path="/reports" component={Reports} />
-      <ProtectedRoute path="/clients" component={Clients} />
-      <ProtectedRoute path="/projects" component={Projects} />
-      <ProtectedRoute path="/team" component={Team} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/time-entries">
+        <AppLayout>
+          <ProtectedRoute path="/time-entries" component={TimeEntries} />
+        </AppLayout>
+      </Route>
+      <Route path="/reports">
+        <AppLayout>
+          <ProtectedRoute path="/reports" component={Reports} />
+        </AppLayout>
+      </Route>
+      <Route path="/clients">
+        <AppLayout>
+          <ProtectedRoute path="/clients" component={Clients} />
+        </AppLayout>
+      </Route>
+      <Route path="/projects">
+        <AppLayout>
+          <ProtectedRoute path="/projects" component={Projects} />
+        </AppLayout>
+      </Route>
+      <Route path="/team">
+        <AppLayout>
+          <ProtectedRoute path="/team" component={Team} />
+        </AppLayout>
+      </Route>
+      <Route path="/">
+        <AppLayout>
+          <ProtectedRoute path="/" component={Dashboard} />
+        </AppLayout>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-function AppRoutes() {
-  return (
-    <AppLayout>
-      <Router />
-    </AppLayout>
-  );
-}
-
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Router />
           <Toaster />
-          <AppRoutes />
-        </AuthProvider>
-      </TooltipProvider>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
-
-export default App;

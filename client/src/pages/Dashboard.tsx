@@ -28,7 +28,7 @@ const Dashboard = () => {
   const currentUserId = 1;
   
   // Fetch time entries with filters
-  const { data: timeEntries, isLoading: isLoadingTimeEntries } = useQuery({
+  const { data: timeEntries = [], isLoading: isLoadingTimeEntries } = useQuery<any[]>({
     queryKey: ['/api/time-entries', filters],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
@@ -43,24 +43,24 @@ const Dashboard = () => {
   });
   
   // Fetch users, clients, and projects to augment the time entry data
-  const { data: users, isLoading: isLoadingUsers } = useQuery({
+  const { data: users = [], isLoading: isLoadingUsers } = useQuery<any[]>({
     queryKey: ['/api/users'],
   });
   
-  const { data: clients, isLoading: isLoadingClients } = useQuery({
+  const { data: clients = [], isLoading: isLoadingClients } = useQuery<any[]>({
     queryKey: ['/api/clients'],
   });
   
-  const { data: projects, isLoading: isLoadingProjects } = useQuery({
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<any[]>({
     queryKey: ['/api/projects'],
   });
   
   // Prepare enriched time entries with user, client, and project details
-  const enrichedTimeEntries = timeEntries?.map(entry => ({
+  const enrichedTimeEntries = timeEntries.map((entry: any) => ({
     ...entry,
-    user: users?.find(user => user.id === entry.userId),
-    client: clients?.find(client => client.id === entry.clientId),
-    project: projects?.find(project => project.id === entry.projectId),
+    user: users.find((user: any) => user.id === entry.userId),
+    client: clients.find((client: any) => client.id === entry.clientId),
+    project: projects.find((project: any) => project.id === entry.projectId),
   })) || [];
   
   // Fetch report summary data for stats
@@ -82,7 +82,7 @@ const Dashboard = () => {
   const statsData = {
     totalHours: reportSummary?.totalHours || 0,
     totalHoursChange: 12, // Mock data for demo
-    activeProjects: projects?.filter(p => p.isActive).length || 0,
+    activeProjects: projects.filter((p: any) => p.isActive).length || 0,
     activeProjectsChange: -2, // Mock data for demo
     overtimeHours: 12, // Mock data for demo
     overtimeHoursChange: 8, // Mock data for demo
@@ -101,21 +101,21 @@ const Dashboard = () => {
   ];
   
   // Project chart data
-  const projectChartData = projects?.map((project, index) => ({
+  const projectChartData = projects.map((project: any, index: number) => ({
     name: project.name,
     hours: reportSummary?.byProject?.[project.id] || 0,
     color: chartColors[index % chartColors.length],
-  })).filter(item => item.hours > 0).sort((a, b) => b.hours - a.hours).slice(0, 6) || [];
+  })).filter((item: any) => item.hours > 0).sort((a: any, b: any) => b.hours - a.hours).slice(0, 6) || [];
   
   // Client chart data
-  const clientChartData = clients?.map((client, index) => ({
+  const clientChartData = clients.map((client: any, index: number) => ({
     name: client.name,
     hours: reportSummary?.byClient?.[client.id] || 0,
     color: chartColors[index % chartColors.length],
-  })).filter(item => item.hours > 0).sort((a, b) => b.hours - a.hours).slice(0, 6) || [];
+  })).filter((item: any) => item.hours > 0).sort((a: any, b: any) => b.hours - a.hours).slice(0, 6) || [];
   
   // Mock team workload data
-  const teamWorkloadData = users?.map(user => ({
+  const teamWorkloadData = users.map((user: any) => ({
     id: user.id,
     fullName: user.fullName,
     role: user.role,

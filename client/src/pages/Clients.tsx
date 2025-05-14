@@ -28,7 +28,7 @@ const Clients = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch clients
-  const { data: clients, isLoading } = useQuery({
+  const { data: clients = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/clients'],
   });
 
@@ -124,7 +124,7 @@ const Clients = () => {
   const handleEditClient = (client: any) => {
     setEditingClient(client);
     form.reset({
-      name: client.name,
+      name: client.name || "",
       contactName: client.contactName || "",
       contactEmail: client.contactEmail || "",
       phone: client.phone || "",
@@ -152,8 +152,8 @@ const Clients = () => {
   };
 
   // Filter clients based on search query
-  const filteredClients = clients?.filter(client => 
-    client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredClients = clients.filter((client: any) => 
+    client.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (client.contactName && client.contactName.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (client.contactEmail && client.contactEmail.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -319,7 +319,7 @@ const Clients = () => {
                   <FormItem>
                     <FormLabel>Contact Person</FormLabel>
                     <FormControl>
-                      <Input placeholder="Contact person name" {...field} />
+                      <Input placeholder="Contact person name" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -337,6 +337,7 @@ const Clients = () => {
                         type="email" 
                         placeholder="contact@example.com" 
                         {...field} 
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -351,7 +352,7 @@ const Clients = () => {
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(123) 456-7890" {...field} />
+                      <Input placeholder="(123) 456-7890" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

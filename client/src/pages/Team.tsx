@@ -46,7 +46,7 @@ const Team = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch team members
-  const { data: users, isLoading } = useQuery({
+  const { data: users = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/users'],
   });
 
@@ -105,7 +105,7 @@ const Team = () => {
   };
 
   // Filter users based on search query
-  const filteredUsers = users?.filter(user => 
+  const filteredUsers = users.filter((user: any) => 
     user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -114,13 +114,10 @@ const Team = () => {
 
   // Calculate team statistics
   const getTeamStats = () => {
-    if (!users) return { total: 0, byRole: {} };
-    
     const byRole: Record<string, number> = {};
-    users.forEach(user => {
+    users.forEach((user: any) => {
       byRole[user.role] = (byRole[user.role] || 0) + 1;
     });
-    
     return {
       total: users.length,
       byRole,
@@ -246,7 +243,7 @@ const Team = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUsers?.map((user) => (
+                    {filteredUsers.map((user: any) => (
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center">

@@ -26,14 +26,13 @@ const TimeEntries = () => {
   const currentUserId = 1;
   
   // Fetch time entries with filters
-  const { data: timeEntries, isLoading: isLoadingTimeEntries } = useQuery({
+  const { data: timeEntries = [], isLoading: isLoadingTimeEntries } = useQuery<any[]>({
     queryKey: ['/api/time-entries', filters],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
       if (filters.startDate) queryParams.append('startDate', filters.startDate);
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       if (filters.userId) queryParams.append('userId', filters.userId.toString());
-      
       const response = await fetch(`/api/time-entries?${queryParams.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch time entries');
       return response.json();
@@ -41,25 +40,25 @@ const TimeEntries = () => {
   });
   
   // Fetch users, clients, and projects to augment the time entry data
-  const { data: users, isLoading: isLoadingUsers } = useQuery({
+  const { data: users = [], isLoading: isLoadingUsers } = useQuery<any[]>({
     queryKey: ['/api/users'],
   });
   
-  const { data: clients, isLoading: isLoadingClients } = useQuery({
+  const { data: clients = [], isLoading: isLoadingClients } = useQuery<any[]>({
     queryKey: ['/api/clients'],
   });
   
-  const { data: projects, isLoading: isLoadingProjects } = useQuery({
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<any[]>({
     queryKey: ['/api/projects'],
   });
   
   // Prepare enriched time entries with user, client, and project details
-  const enrichedTimeEntries = timeEntries?.map(entry => ({
+  const enrichedTimeEntries = timeEntries.map((entry: any) => ({
     ...entry,
-    user: users?.find(user => user.id === entry.userId),
-    client: clients?.find(client => client.id === entry.clientId),
-    project: projects?.find(project => project.id === entry.projectId),
-  })) || [];
+    user: users.find((user: any) => user.id === entry.userId),
+    client: clients.find((client: any) => client.id === entry.clientId),
+    project: projects.find((project: any) => project.id === entry.projectId),
+  }));
   
   // Delete time entry mutation
   const deleteTimeEntryMutation = useMutation({

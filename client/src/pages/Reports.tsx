@@ -36,7 +36,7 @@ const Reports = () => {
   });
 
   // Fetch time entries with filters
-  const { data: timeEntries, isLoading: isLoadingTimeEntries } = useQuery({
+  const { data: timeEntries = [], isLoading: isLoadingTimeEntries } = useQuery<any[]>({
     queryKey: ['/api/time-entries', filters],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
@@ -51,7 +51,7 @@ const Reports = () => {
   });
 
   // Fetch report summary data
-  const { data: reportSummary, isLoading: isLoadingReportSummary } = useQuery({
+  const { data: reportSummary, isLoading: isLoadingReportSummary } = useQuery<any>({
     queryKey: ['/api/reports/summary', filters],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
@@ -66,17 +66,17 @@ const Reports = () => {
   });
 
   // Fetch users
-  const { data: users, isLoading: isLoadingUsers } = useQuery({
+  const { data: users = [], isLoading: isLoadingUsers } = useQuery<any[]>({
     queryKey: ['/api/users'],
   });
 
   // Fetch clients
-  const { data: clients, isLoading: isLoadingClients } = useQuery({
+  const { data: clients = [], isLoading: isLoadingClients } = useQuery<any[]>({
     queryKey: ['/api/clients'],
   });
 
   // Fetch projects
-  const { data: projects, isLoading: isLoadingProjects } = useQuery({
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<any[]>({
     queryKey: ['/api/projects'],
   });
 
@@ -128,25 +128,25 @@ const Reports = () => {
   // Prepare data for charts
   const prepareChartData = () => {
     // By user
-    const userChartData = users?.map(user => ({
+    const userChartData = users.map((user: any) => ({
       name: user.fullName,
       hours: reportSummary?.byUser?.[user.id] || 0,
       color: getRandomColor(user.id),
-    })).filter(item => item.hours > 0).sort((a, b) => b.hours - a.hours) || [];
+    })).filter((item: any) => item.hours > 0).sort((a: any, b: any) => b.hours - a.hours);
 
     // By client
-    const clientChartData = clients?.map(client => ({
+    const clientChartData = clients.map((client: any) => ({
       name: client.name,
       hours: reportSummary?.byClient?.[client.id] || 0,
       color: getRandomColor(client.id),
-    })).filter(item => item.hours > 0).sort((a, b) => b.hours - a.hours) || [];
+    })).filter((item: any) => item.hours > 0).sort((a: any, b: any) => b.hours - a.hours);
     
     // By project
-    const projectChartData = projects?.map(project => ({
+    const projectChartData = projects.map((project: any) => ({
       name: project.name,
       hours: reportSummary?.byProject?.[project.id] || 0,
       color: getRandomColor(project.id),
-    })).filter(item => item.hours > 0).sort((a, b) => b.hours - a.hours) || [];
+    })).filter((item: any) => item.hours > 0).sort((a: any, b: any) => b.hours - a.hours);
 
     return {
       userChartData,
@@ -182,10 +182,10 @@ const Reports = () => {
     let csv = "User,Client,Project,Date,Hours,Description\n";
     
     // Add data
-    timeEntries.forEach(entry => {
-      const user = users?.find(u => u.id === entry.userId)?.fullName || '';
-      const client = clients?.find(c => c.id === entry.clientId)?.name || '';
-      const project = projects?.find(p => p.id === entry.projectId)?.name || '';
+    timeEntries.forEach((entry: any) => {
+      const user = users.find((u: any) => u.id === entry.userId)?.fullName || '';
+      const client = clients.find((c: any) => c.id === entry.clientId)?.name || '';
+      const project = projects.find((p: any) => p.id === entry.projectId)?.name || '';
       const date = format(new Date(entry.date), 'yyyy-MM-dd');
       const hours = entry.hours.toString();
       const description = entry.description ? `"${entry.description.replace(/"/g, '""')}"` : '';
@@ -314,7 +314,7 @@ const Reports = () => {
                             tick={{ fontSize: 12 }}
                           />
                           <Tooltip />
-                          <Bar dataKey="hours" nameKey="name">
+                          <Bar dataKey="hours">
                             {chartData.userChartData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
@@ -346,7 +346,6 @@ const Reports = () => {
                             outerRadius={80}
                             fill="#8884d8"
                             dataKey="hours"
-                            nameKey="name"
                           >
                             {chartData.clientChartData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
@@ -406,10 +405,10 @@ const Reports = () => {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        timeEntries.slice(0, 10).map((entry) => {
-                          const user = users?.find((u) => u.id === entry.userId);
-                          const client = clients?.find((c) => c.id === entry.clientId);
-                          const project = projects?.find((p) => p.id === entry.projectId);
+                        timeEntries.slice(0, 10).map((entry: any) => {
+                          const user = users.find((u: any) => u.id === entry.userId);
+                          const client = clients.find((c: any) => c.id === entry.clientId);
+                          const project = projects.find((p: any) => p.id === entry.projectId);
                           
                           return (
                             <TableRow key={entry.id}>
@@ -464,7 +463,7 @@ const Reports = () => {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="hours" name="Hours" fill="#3B82F6">
+                        <Bar dataKey="hours">
                           {chartData.userChartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
@@ -508,13 +507,13 @@ const Reports = () => {
                             <TableCell className="text-right"><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
                           </TableRow>
                         ))
-                      ) : users?.filter(user => 
+                      ) : users.filter((user: any) => 
                         reportSummary?.byUser?.[user.id] !== undefined
-                      ).map((user) => {
+                      ).map((user: any) => {
                         const userHours = reportSummary?.byUser?.[user.id] || 0;
-                        const userProjects = timeEntries?.filter(entry => entry.userId === user.id)
-                          .map(entry => entry.projectId)
-                          .filter((value, index, self) => self.indexOf(value) === index).length || 0;
+                        const userProjects = timeEntries.filter((entry: any) => entry.userId === user.id)
+                          .map((entry: any) => entry.projectId)
+                          .filter((value: any, index: number, self: any[]) => self.indexOf(value) === index).length || 0;
                             
                         // Calculate avg hours per day - assuming entries span over days in the filter period
                         const start = new Date(filters.startDate);
@@ -573,7 +572,7 @@ const Reports = () => {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="hours" name="Hours" fill="#10B981">
+                        <Bar dataKey="hours">
                           {chartData.clientChartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
@@ -612,16 +611,16 @@ const Reports = () => {
                             <TableCell className="text-right"><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
                           </TableRow>
                         ))
-                      ) : clients?.filter(client => 
+                      ) : clients.filter((client: any) => 
                         reportSummary?.byClient?.[client.id] !== undefined
-                      ).map((client) => {
+                      ).map((client: any) => {
                         const clientHours = reportSummary?.byClient?.[client.id] || 0;
-                        const clientProjects = timeEntries?.filter(entry => entry.clientId === client.id)
-                          .map(entry => entry.projectId)
-                          .filter((value, index, self) => self.indexOf(value) === index).length || 0;
-                        const clientUsers = timeEntries?.filter(entry => entry.clientId === client.id)
-                          .map(entry => entry.userId)
-                          .filter((value, index, self) => self.indexOf(value) === index).length || 0;
+                        const clientProjects = timeEntries.filter((entry: any) => entry.clientId === client.id)
+                          .map((entry: any) => entry.projectId)
+                          .filter((value: any, index: number, self: any[]) => self.indexOf(value) === index).length || 0;
+                        const clientUsers = timeEntries.filter((entry: any) => entry.clientId === client.id)
+                          .map((entry: any) => entry.userId)
+                          .filter((value: any, index: number, self: any[]) => self.indexOf(value) === index).length || 0;
                             
                         return (
                           <TableRow key={client.id}>
@@ -666,7 +665,7 @@ const Reports = () => {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="hours" name="Hours" fill="#8B5CF6">
+                        <Bar dataKey="hours">
                           {chartData.projectChartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
@@ -705,14 +704,14 @@ const Reports = () => {
                             <TableCell className="text-center"><Skeleton className="h-4 w-16 mx-auto" /></TableCell>
                           </TableRow>
                         ))
-                      ) : projects?.filter(project => 
+                      ) : projects.filter((project: any) => 
                         reportSummary?.byProject?.[project.id] !== undefined
-                      ).map((project) => {
+                      ).map((project: any) => {
                         const projectHours = reportSummary?.byProject?.[project.id] || 0;
-                        const projectClient = clients?.find(c => c.id === project.clientId);
-                        const projectUsers = timeEntries?.filter(entry => entry.projectId === project.id)
-                          .map(entry => entry.userId)
-                          .filter((value, index, self) => self.indexOf(value) === index).length || 0;
+                        const projectClient = clients.find((c: any) => c.id === project.clientId);
+                        const projectUsers = timeEntries.filter((entry: any) => entry.projectId === project.id)
+                          .map((entry: any) => entry.userId)
+                          .filter((value: any, index: number, self: any[]) => self.indexOf(value) === index).length || 0;
                             
                         return (
                           <TableRow key={project.id}>

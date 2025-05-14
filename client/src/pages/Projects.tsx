@@ -32,12 +32,12 @@ const Projects = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch projects
-  const { data: projects, isLoading: isLoadingProjects } = useQuery({
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<any[]>({
     queryKey: ['/api/projects'],
   });
 
   // Fetch clients for the dropdown
-  const { data: clients, isLoading: isLoadingClients } = useQuery({
+  const { data: clients = [], isLoading: isLoadingClients } = useQuery<any[]>({
     queryKey: ['/api/clients'],
   });
 
@@ -161,10 +161,10 @@ const Projects = () => {
   };
 
   // Filter projects based on search query
-  const filteredProjects = projects?.filter(project => 
+  const filteredProjects = projects.filter((project: any) => 
     project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (project.description && project.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (clients?.find(c => c.id === project.clientId)?.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    (clients.find((c: any) => c.id === project.clientId)?.name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const isLoading = isLoadingProjects || isLoadingClients;
@@ -253,8 +253,8 @@ const Projects = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredProjects?.map((project) => {
-                      const clientName = clients?.find(c => c.id === project.clientId)?.name || "—";
+                    {filteredProjects?.map((project: any) => {
+                      const clientName = clients.find((c: any) => c.id === project.clientId)?.name || "—";
                       return (
                         <TableRow key={project.id}>
                           <TableCell className="font-medium">{project.name}</TableCell>
@@ -352,7 +352,7 @@ const Projects = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {clients?.map((client) => (
+                        {clients.map((client: any) => (
                           <SelectItem key={client.id} value={client.id.toString()}>
                             {client.name}
                           </SelectItem>
@@ -375,6 +375,7 @@ const Projects = () => {
                         placeholder="Project description" 
                         rows={3} 
                         {...field} 
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
