@@ -73,27 +73,28 @@ const TimeEntryModal = ({ isOpen, onClose, entryId, userId }: TimeEntryModalProp
   // Update form values when editing an existing entry
   useEffect(() => {
     if (timeEntry && isEditMode) {
+      // Extract values safely with fallbacks
       form.reset({
-        userId: timeEntry.userId,
+        userId: timeEntry.userId || userId,
         clientId: timeEntry.clientId,
         projectId: timeEntry.projectId,
-        year: timeEntry.year,
-        month: timeEntry.month,
-        week: timeEntry.week,
+        year: timeEntry.year || new Date().getFullYear(),
+        month: timeEntry.month || (new Date().getMonth() + 1),
+        week: timeEntry.week || 1,
         date: timeEntry.date ? new Date(timeEntry.date) : new Date(),
         hours: timeEntry.hours ? parseFloat(timeEntry.hours.toString()) : 0,
         description: timeEntry.description || "",
       });
     }
-  }, [timeEntry, isEditMode, form]);
+  }, [timeEntry, isEditMode, form, userId]);
 
   // Update projects based on selected client
-  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const [filteredProjects, setFilteredProjects] = useState<Project[] | undefined>(projects);
   
   const clientId = form.watch('clientId');
   useEffect(() => {
     if (clientId && projects) {
-      setFilteredProjects(projects.filter(project => project.clientId === clientId));
+      setFilteredProjects(projects.filter((project: Project) => project.clientId === clientId));
     } else {
       setFilteredProjects(projects);
     }
@@ -186,7 +187,7 @@ const TimeEntryModal = ({ isOpen, onClose, entryId, userId }: TimeEntryModalProp
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {clients?.map(client => (
+                      {clients?.map((client: Client) => (
                         <SelectItem key={client.id} value={client.id.toString()}>
                           {client.name}
                         </SelectItem>
@@ -215,7 +216,7 @@ const TimeEntryModal = ({ isOpen, onClose, entryId, userId }: TimeEntryModalProp
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {filteredProjects?.map(project => (
+                      {filteredProjects?.map((project: Project) => (
                         <SelectItem key={project.id} value={project.id.toString()}>
                           {project.name}
                         </SelectItem>
