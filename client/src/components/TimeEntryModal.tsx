@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { timeEntryFormSchema } from "@shared/schema";
+import { timeEntryFormSchema, TimeEntry, Client, Project } from "@shared/schema";
 import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -38,19 +38,19 @@ const TimeEntryModal = ({ isOpen, onClose, entryId, userId }: TimeEntryModalProp
   const isEditMode = !!entryId;
   
   // Fetch clients for dropdown
-  const { data: clients } = useQuery({
+  const { data: clients } = useQuery<Client[]>({
     queryKey: ['/api/clients'],
     enabled: isOpen,
   });
   
   // Fetch projects for dropdown
-  const { data: projects } = useQuery({
+  const { data: projects } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
     enabled: isOpen,
   });
   
   // Fetch time entry data if in edit mode
-  const { data: timeEntry, isLoading: isLoadingTimeEntry } = useQuery({
+  const { data: timeEntry, isLoading: isLoadingTimeEntry } = useQuery<TimeEntry>({
     queryKey: ['/api/time-entries', entryId],
     enabled: isOpen && isEditMode,
   });
@@ -80,8 +80,8 @@ const TimeEntryModal = ({ isOpen, onClose, entryId, userId }: TimeEntryModalProp
         year: timeEntry.year,
         month: timeEntry.month,
         week: timeEntry.week,
-        date: new Date(timeEntry.date),
-        hours: parseFloat(timeEntry.hours.toString()),
+        date: timeEntry.date ? new Date(timeEntry.date) : new Date(),
+        hours: timeEntry.hours ? parseFloat(timeEntry.hours.toString()) : 0,
         description: timeEntry.description || "",
       });
     }
